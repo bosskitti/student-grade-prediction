@@ -280,6 +280,20 @@ plt.show()
 #### 🌲 แผนภาพโครงสร้างต้นไม้แบบถ่วงน้ำหนัก (Class Weighted Tree - Pre-Pruned):
 ![Class Weighted Decision Tree](images/tree_weighted.png)
 
+### 4.7 สรุปผลเปรียบเทียบโมเดล Decision Tree ทุกเวอร์ชัน (คนที่ 1: `bosskitti`)
+เพื่อสรุปผลงานของคนที่ 1 ก่อนส่งไม้ต่อไปยังโมเดล Naive Bayes ของคนที่ 2 ตารางด้านล่างแสดงผลลัพธ์ของโมเดล Decision Tree ทั้ง 4 สายพันธุ์ที่ผ่านการทดลอง:
+
+#### 📊 ตารางสรุปผลการทดลอง Decision Tree ทุกเวอร์ชัน (Comprehensive Benchmark):
+| โมเดล (Decision Tree Variant) | Train Acc | Test Acc | Recall (เด็กตก) | ความลึก | จำนวนใบไม้ | บทบาทและการนำไปใช้งานจริง |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **1. Baseline (Unpruned Tree)** | 100.00% | 77.69% | 20.00% (4/20) | 9 ชั้น | 55 ใบ | ท่องจำข้อมูล เกิด High Variance / Overfitting อย่างหนัก |
+| **2. Pre-Pruned (`max_depth=4`)** | 91.52% | 76.92% | 20.00% (4/20) | 4 ชั้น | 16 ใบ | คุมความลึกได้ดี แก้ Overfitting ในระดับหนึ่ง |
+| **3. Post-Pruned (`ccp_alpha=0.00681`) 🏆** | **89.21%** | **80.00%** | **25.00% (5/20)** | **4 ชั้น** | **5 ใบ** | **แชมป์ความแม่นยำสูงสุด 80% โปร่งใส กะทัดรัด (โมเดลหลัก)** |
+| **4. Class-Weighted (`balanced`) ⚖️** | **86.71%** | **70.77%** | **45.00% (9/20)** | **4 ชั้น** | **14 ใบ** | **แชมป์ Recall สูงสุด 45% เหมาะกับระบบ Early Warning ดักจับเด็กเสี่ยง** |
+
+#### ⚖️ การเปรียบเทียบ Confusion Matrix: โมเดลเน้นความแม่นยำ (ซ้าย) vs โมเดลเน้นจับเด็กตก (ขวา)
+![Confusion Matrix Decision Tree Comparison](images/cm_dt_comparison.png)
+
 ---
 
 ## 5. เจาะลึกงานคนที่ 2: โมเดล Naive Bayes (`S-Jiraarsavakaew`)
