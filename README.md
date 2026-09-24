@@ -128,7 +128,12 @@
 2. **กฎข้อที่ 2 (กลุ่มเสี่ยงปานกลาง):** ถ้าไม่เคยสอบตก แต่ไม่มีแรงจูงใจเรียนต่อ (`higher_yes = 0`) $\rightarrow$ **อัตราการสอบตกพุ่งสูงขึ้นอย่างมีนัยสำคัญ**
 3. **กฎข้อที่ 3 (กลุ่มวิกฤต):** ถ้านักเรียนเคยสอบตกสะสมในอดีตมาแล้วตั้งแต่ 1 ครั้งขึ้นไป (`failures >= 1`) $\rightarrow$ **จัดเป็นกลุ่มเสี่ยงตกสูงสุด (Early Warning Target)**
 
-![Tree Structure](images/tree_structure.png)
+#### 📊 เปรียบเทียบแผนภาพต้นไม้: แบบ Pre-Pruning vs แบบ Post-Pruning:
+* **ต้นไม้แบบ Pre-Pruning (`max_depth=4`, มีใบไม้ 15 ใบ - ยังคงมีกิ่งย่อยรกและเสี่ยง Overfitting บางส่วน):**
+![Pre-Pruned Tree](images/tree_prepruned.png)
+
+* **ต้นไม้ตัวแทนที่ดีที่สุดแบบ Post-Pruning (`ccp_alpha=0.00681`, ยุบเหลือ 5 ใบไม้หลัก - ชัดเจน โปร่งใส และแม่นยำ 80.00%):**
+![Optimal Post-Pruned Tree](images/tree_structure.png)
 
 ### 4.5 การวิเคราะห์ค่าน้ำหนักความสำคัญของตัวแปร (Feature Importance - บทที่ 5.5)
 โมเดลคำนวณค่าน้ำหนักจากผลรวมการลดลงของความไม่บริสุทธิ์ (Normalized Gini Importance):
