@@ -74,13 +74,17 @@ student-grade-prediction/
 | **ROC-AUC Score** | 0.5409 | **0.6818** | 0.5023 | **0.5905** |
 
 ### 🖼️ ภาพผลลัพธ์สำคัญ (Key Visualizations)
-| แผนผังต้นไม้การตัดสินใจ (Decision Tree) | การเปรียบเทียบ Confusion Matrices |
+| แผนผังต้นไม้การตัดสินใจ (Decision Tree) | การเปรียบเทียบ Confusion Matrices (ทั้ง 3 โมเดล) |
 | :---: | :---: |
-| ![Decision Tree](images/tree_structure.png) | ![Confusion Matrices](images/confusion_matrices.png) |
+| ![Decision Tree](images/tree_structure.png) | ![Confusion Matrices](images/confusion_matrices_all.png) |
 
-| การเปรียบเทียบเส้น ROC Curves | ค่าน้ำหนักความสำคัญของตัวแปร (Feature Importance) |
+| การเปรียบเทียบเส้น ROC Curves (ทั้ง 3 โมเดล) | การแบ่งช่วงตัวเลข Discretization (ผลงานคนที่ 2) |
 | :---: | :---: |
-| ![ROC Curves](images/roc_curves.png) | ![Feature Importance](images/feature_importance.png) |
+| ![ROC Curves](images/roc_curves_all.png) | ![Discretization](images/nb_discretization_bins.png) |
+
+| ค่าน้ำหนักความสำคัญของตัวแปร (Feature Importance) | การตรวจจับ Outlier ด้วยวิธี IQR |
+| :---: | :---: |
+| ![Feature Importance](images/feature_importance.png) | ![Outliers](images/outliers_boxplot.png) |
 
 ---
 
