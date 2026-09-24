@@ -239,8 +239,46 @@
 
 ![Feature Importance](images/feature_importance.png)
 
-### 4.6 การทดลองเสริม: การแก้ปัญหา Imbalance ด้วย Class Weight
-เมื่อใส่พารามิเตอร์ `class_weight='balanced'` เพื่อลงโทษโมเดลหนักขึ้นหากทำนายเด็กตกผิด พบว่าสามารถดัน **Recall ของคลาสสอบตก (Fail) จาก 25.0% พุ่งขึ้นเป็น 45.0% (จับเด็กตกได้เพิ่มขึ้นเกือบเท่าตัวจาก 5 คนเป็น 9 คน)**
+### 4.6 การทดลองเสริม: การแก้ปัญหา Imbalance ด้วย Class Weight และการ Prune กิ่ง
+เพื่อตอบโจทย์กรณีที่สถานศึกษาต้องการโฟกัสการตรวจจับเด็กกลุ่มเสี่ยงสอบตกเป็นภารกิจสูงสุดตามหลัก **Asymmetric Misclassification Costs (บทที่ 5.4.1)** เราได้ทดลองเพิ่มพารามิเตอร์ `class_weight='balanced'` ร่วมกับ **Pre-Pruning (`max_depth=4` - บทที่ 5.2.8)**:
+
+#### 1. กลไกคณิตศาสตร์เบื้องหลัง `class_weight='balanced'`:
+Scikit-learn ไม่ได้ทำการ Resampling เพิ่มแถวข้อมูล แต่คำนวณค่าน้ำหนักประจำคลาสแบบผกผัน $w_j = \frac{n_{\text{samples}}}{n_{\text{classes}} \times n_j}$:
+* **น้ำหนักคลาสเด็กตก ($w_0$):** $\frac{519}{2 \times 80} = \mathbf{3.24375}$
+* **น้ำหนักคลาสเด็กผ่าน ($w_1$):** $\frac{519}{2 \times 439} = \mathbf{0.59112}$
+* **อัตราส่วนน้ำหนัก:** $\frac{w_0}{w_1} \approx \mathbf{5.4875 \text{ เท่า}}$ หมายความว่า **"เด็กสอบตก 1 คน มีน้ำหนักความสำคัญเทียบเท่าเด็กผ่านถึงเกือบ 5.5 คน!"**
+
+#### 2. แล้วโมเดลนี้ไม่ได้ PRUNE หรอ? ทำไมใช้ `max_depth=4`? (คำถามสำคัญ):
+* **คำตอบคือ: นี่คือการ PRUNE เรียบร้อยแล้วครับ!** โดยใช้เทคนิค **Pre-Pruning (การตัดแต่งกิ่งล่วงหน้าตามบทที่ 5.2.8)** ด้วยเงื่อนไข Early Stopping ที่ `max_depth=4`
+* **ถ้าไม่ Prune เลยจะเกิดอะไรขึ้น? (Unpruned Weighted Tree):**  
+  เมื่อปล่อยให้ต้นไม้ถ่วงน้ำหนักโตเต็มที่ ต้นไม้จะแตกกิ่งลึกถึง **13 ชั้น มีใบไม้ 74 ใบ** เกิดปัญหา Overfitting อย่างหนัก และจับเด็กตกได้เพียง **4/20 คน (Recall เหลือ 20.0%)** เท่านั้น
+* **เมื่อทำ Pre-Pruning (`max_depth=4`):**  
+  ต้นไม้ถูกคุมให้เหลือ **14 ใบไม้** และดัน Recall เด็กตกพุ่งขึ้นเป็น **45.0% (จับเด็กตกได้ 9/20 คน)** เพิ่มขึ้นเกือบเท่าตัว!
+
+#### 3. รูปร่างของต้นไม้เปลี่ยนไปอย่างไรเมื่อใส่ Weight? (Tree Topology Changes):
+1. **โหนดรากยังคงเป็น `failures <= 0.5` เหมือนเดิม:** ตัวแปรประวัติการตกยังคงมีพลังแบ่งแยกสูงสุด
+2. **ดึงตัวแปร `absences <= 11.0` (วันขาดเรียน) ขึ้นมาเป็นกิ่งหลัก:** ในกลุ่มเด็กไม่เคยสอบตก โมเดลมองเห็นว่าเด็กที่ขาดเรียน $> 11$ วันมีความเสี่ยงตกสูง จึงดึงมาเป็นเงื่อนไขตัดแบ่งตั้งแต่ชั้นที่ 3 ทันที
+3. **ดึงตัวแปร `schoolsup_yes` ในกลุ่มเด็กเคยสอบตก:** ช่วยแยกแยะเด็กตกที่ได้รับความช่วยเหลือจากโรงเรียน
+4. **สัดส่วนใบไม้ที่ทำนายว่าสอบตก (Fail: สีส้ม) เพิ่มขึ้นอย่างเห็นได้ชัด:** จากแบบเดิมที่มี 37.5% (6/16 ใบ) พุ่งขึ้นเป็น **57.1% (8/14 ใบ)** สะท้อนว่าต้นไม้มีความไว (Sensitivity) ต่อนักเรียนกลุ่มเสี่ยงสูงขึ้นมาก
+
+#### 💻 โค้ดการสร้างและพล็อตแผนภาพต้นไม้ถ่วงน้ำหนัก:
+```python
+# 1. เทรนโมเดลแบบใส่ Class Weight ร่วมกับ Pre-Pruning (max_depth=4)
+dt_weighted = DecisionTreeClassifier(max_depth=4, class_weight='balanced', random_state=42)
+dt_weighted.fit(X_train, y_train)
+
+# 2. พล็อตแผนภาพโครงสร้างต้นไม้ Decision Tree แบบถ่วงน้ำหนัก
+plt.figure(figsize=(26, 12), facecolor='#ffffff')
+plot_tree(dt_weighted, feature_names=list(X_train.columns), class_names=['Fail (0)', 'Pass (1)'],
+          filled=True, rounded=True, fontsize=9)
+plt.title("[Decision Tree] แผนภาพโครงสร้าง Decision Tree แบบถ่วงน้ำหนัก (Class Weighted: max_depth=4, class_weight='balanced')",
+          fontsize=16, fontweight='bold', pad=15)
+plt.savefig('images/tree_weighted.png', dpi=300, bbox_inches='tight')
+plt.show()
+```
+
+#### 🌲 แผนภาพโครงสร้างต้นไม้แบบถ่วงน้ำหนัก (Class Weighted Tree - Pre-Pruned):
+![Class Weighted Decision Tree](images/tree_weighted.png)
 
 ---
 
