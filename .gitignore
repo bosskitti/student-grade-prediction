@@ -1,0 +1,24 @@
+# Lecture notes (Keep local, do not push to public repo)
+บทที่ *.html
+*.ovf
+*.vmdk
+
+# Scripts
+generate_*.py
+build_notebooks.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+dist/
+build/
+
+# Jupyter Checkpoints
+.ipynb_checkpoints/
+
+# OS specific
+.DS_Store
+Thumbs.db
