@@ -181,6 +181,24 @@
 > 💡 *อ้างอิงเนื้อหาตาม **บทที่ 5.4 การวัดประสิทธิภาพของ Classification Model***  
 > *ไฟล์งาน: `notebooks/04_model_comparison.ipynb`*
 
+### 6.1 รากฐานทางทฤษฎี: ทำไมต้องนำ 2 โมเดลนี้มาเปรียบเทียบกัน? (Theoretical Rationale)
+ในกระบวนทัศน์การเรียนรู้ของเครื่อง (Machine Learning) **Decision Tree (บทที่ 5)** และ **Naive Bayes (บทที่ 6)** ถือเป็น **"ตัวแทนของ 2 ขั้วปรัชญาตรงข้าม (Opposing Paradigms)"**:
+* **Decision Tree (ขั้ว Discriminative / Non-parametric):** มุ่งหาเส้นแบ่งการตัดสินใจ (Decision Boundaries) โดยตรงจากข้อมูลโดยไม่มีสมมติฐานการแจกแจงล่วงหน้า เพื่อแบ่งแยกคลาสให้ขาดออกจากกัน
+* **Naive Bayes (ขั้ว Generative / Probabilistic):** มุ่งสร้างแบบจำลองการแจกแจงร่วม $P(X|C)$ แล้วใช้ทฤษฎีของเบย์ (Bayes' Theorem) คำนวณความน่าจะเป็นภายหลัง (Posterior Probability $P(C|X)$) ผ่านสมมติฐานความเป็นอิสระต่อกัน (Conditional Independence)
+
+#### 📊 ตารางเปรียบเทียบหมัดต่อหมัดในเชิงทฤษฎี (Theoretical Comparison Matrix):
+| มิติเชิงทฤษฎี (Theoretical Dimension) | 🌲 Decision Tree (บทที่ 5) | 🎲 Naive Bayes (บทที่ 6) | ผลกระทบต่อโจทย์จริง (เกรดนักเรียน) |
+| :--- | :--- | :--- | :--- |
+| **1. ปรัชญาคณิตศาสตร์ (Core Formula)** | **Impurity Minimization (CART):**<br>$Gini(S) = 1 - \sum p_i^2$<br>แตกกิ่งด้วยการลดความไม่บริสุทธิ์สูงสุด | **Bayes' Theorem with Independence:**<br>$P(C\|X) \propto P(C) \prod_{i=1}^d P(x_i\|C)$<br>คูณความน่าจะเป็นของแต่ละตัวแปรเข้าด้วยกัน | **DT** ตัดสินด้วยเงื่อนไขชี้ขาดแบบขั้นบันได<br>**NB** ตัดสินด้วยการสะสมน้ำหนักหลักฐาน (Accumulated Evidence) |
+| **2. สมมติฐานข้อมูล (Data Assumptions)** | **ไม่มีสมมติฐาน (Non-parametric / Distribution-Free):** ไม่แคร์ว่าข้อมูลจะเบ้ ไม่สนว่าสเกลจะเท่ากันไหม | **สมมติฐานเข้มงวด 2 ข้อ:**<br>1) ตัวแปรต้องเป็นอิสระต่อกัน ($Conditional\ Independence$)<br>2) ตัวเลขต้องเป็นระฆังคว่ำ ($\mathcal{N}(\mu, \sigma^2)$) | ตัวแปร `absences` เบ้ขวามาก $\rightarrow$ **GaussianNB ล้มเหลว** (Acc เหลือ 63%) แต่ **DT ไม่สะทกสะท้าน** (Acc 80%) |
+| **3. การจับความสัมพันธ์ตัวแปร (Feature Interactions)** | **จับ Interaction ซับซ้อนได้อัตโนมัติ:**<br>ผ่านเงื่อนไขซ้อน (`IF failures=0 THEN IF higher=yes`) | **มองข้าม Interaction สิ้นเชิง (Zero Interaction):** ถือว่าทุกตัวแปรส่งผลแยกจากกันโดยลำพัง | ในชีวิตจริง ปัจจัยนักเรียนมักพึ่งพากัน **DT จึงจับคู่ปัจจัยเสี่ยงได้ลึกซึ้งกว่า** |
+| **4. ความทนทานต่อ Overfitting (Bias-Variance Trade-off)** | **Low Bias / High Variance:**<br>ต้นไม้เดี่ยวพร้อมจะจำข้อมูลทุกเคสจน Overfit ง่ายมาก ต้องอาศัย **Pruning** กู้ชีพ | **High Bias / Low Variance:**<br>นิ่งมาก ไม่ค่อย Overfit แม้ข้อมูลน้อย แต่ถ้าสมมติฐานเบย์ผิด โมเดลจะ Underfit ทันที | **DT** ต้องตัดกิ่งจาก 101 ใบเหลือ 5 ใบ<br>**NB** ไม่ต้องจูนความลึก ได้โมเดลที่คงที่ทันที |
+| **5. เส้นแบ่งขอบเขต (Decision Boundary)** | **เส้นตั้งฉากกับแกน (Axis-aligned Rectangles):** เป็นขั้นบันไดตัดตามค่าตัวเลข | **เส้นโค้งเรียบ (Linear / Quadratic Hyperplane):** ลากผ่านพื้นผิวความน่าจะเป็น | **DT** เหมาะกับกฎเกณฑ์มนุษย์<br>**NB** ให้ค่าความน่าจะเป็นที่ต่อเนื่อง นำไปทำ Ranking ได้ง่าย |
+| **6. รูปแบบความโปร่งใส (Explainability / XAI)** | **Deductive / Rule-based (White-Box):** แกะรอยได้แบบ If-Else ตรวจสอบตรรกะได้ 100% | **Evidentiary / Odds-based:** อธิบายในรูป Likelihood Ratio และผลคูณความน่าจะเป็น | **DT** ชี้แจงผู้ปกครองและเด็กได้ง่ายกว่า ("เพราะเคยสอบตกจึงเสี่ยง") ขณะที่ **NB** ดีในการคิดคะแนนความเสี่ยงรวม (Risk Score) |
+
+---
+
+### 6.2 ตารางเปรียบเทียบผลลัพธ์ประสิทธิภาพจริง (Evaluation Metrics Table)
 การทดสอบทำบนชุดทดสอบมาตรฐานเดียวกัน (**Test Set จำนวน 130 คน**: สอบผ่านจริง 110 คน, สอบตกจริง 20 คน):
 
 | ตัวชี้วัด (Metric) | Decision Tree (Unpruned) | Decision Tree (Post-Pruned) 🏆 | Gaussian Naive Bayes | Categorical Naive Bayes 🌟 |
