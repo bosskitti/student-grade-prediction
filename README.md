@@ -61,8 +61,8 @@
 | บทบาท | ผู้รับผิดชอบ | Branch | ไฟล์งานหลัก | สรุปหน้าที่ความรับผิดชอบ |
 | :--- | :--- | :--- | :--- | :--- |
 | **ส่วนร่วมกัน** | ทั้งสองคน | `main` | `01_eda_and_data_cleaning.ipynb`<br>`04_model_comparison.ipynb` | วางแผนโจทย์, ทำ Data Cleaning, จัดการ Outlier ด้วย IQR, Binarize Target, One-Hot Encoding, แบ่งชุดข้อมูลแบบ Stratified Split, และสรุปผลเปรียบเทียบ |
-| **คนที่ 1** | **`bosskitti`** | `feature/decision-tree` | `02_decision_tree_model.ipynb` | พัฒนา Decision Tree, ตรวจจับปัญหา Overfitting (100%), ทำ Pre-pruning (`max_depth`), ทำ Post-pruning (`ccp_alpha`), พล็อตโครงสร้างต้นไม้, สกัดกฎ If-Else, วิเคราะห์ Feature Importance, และทดลอง Class Weight |
-| **คนที่ 2** | **`S-Jiraarsavakaew`** | `feature/naive-bayes` | `03_naive_bayes_model.ipynb` | พัฒนา Naive Bayes ทั้ง `GaussianNB` และ `CategoricalNB`, ออกแบบการทำ Discretization บนตัวแปรต่อเนื่อง, คำนวณ Permutation Importance, และวิเคราะห์ Class Mean Differences |
+| **คนที่ 1** | **นายกิตติภพ ประจิตร**<br>(`bosskitti`) | `feature/decision-tree` | `02_decision_tree_model.ipynb` | พัฒนา Decision Tree, ตรวจจับปัญหา Overfitting (100%), ทำ Pre-pruning (`max_depth`), ทำ Post-pruning (`ccp_alpha`), พล็อตโครงสร้างต้นไม้, สกัดกฎ If-Else, วิเคราะห์ Feature Importance, และทดลอง Class Weight |
+| **คนที่ 2** | **นายสิทธิชัย จิรอัศวแก้ว**<br>(`S-Jiraarsavakaew`) | `feature/naive-bayes` | `03_naive_bayes_model.ipynb` | พัฒนา Naive Bayes ทั้ง `GaussianNB` และ `CategoricalNB`, ออกแบบการทำ Discretization บนตัวแปรต่อเนื่อง, คำนวณ Permutation Importance, และวิเคราะห์ Class Mean Differences |
 
 ---
 
